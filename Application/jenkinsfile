@@ -6,7 +6,7 @@
         stage('Checkout Code') {
             steps {
                 echo 'scm git'
-                git branch: 'main', url: 'https://github.com/shivakumarchigiri/MyProject.git'
+                git branch: 'main', url: 'https://github.com/shivakumarchigiri/Realtime-Project.git'
             }
         }
     	
@@ -25,22 +25,22 @@
                 echo 'scanning project'
                 sh 'ls -ltr'
                 sh '''cd Application && mvn sonar:sonar \\
-                      -Dsonar.host.url=http://18.221.185.242:9000/ \\
-                      -Dsonar.login=squ_f04a77b47f221f29a87642949bbe36146d90cad7'''
+                      -Dsonar.host.url=http://18.222.20.133:9000/ \\
+                      -Dsonar.login=squ_de533594df97abc8ada7a086e40ec5179b33d30d'''
             }
     	}
        stage('Build docker image'){
             steps{
                 script{
                     echo 'docker image build'
-					sh 'cd Application && docker build -t shivakumarchigiri/realtimeproject:${BUILD_NUMBER} .'
+					sh 'cd Application && docker build -t shivakumarchigiri/rtproject:${BUILD_NUMBER} .'
                 }
             }
         }
 		
        stage('docker image scan'){
         steps{
-            sh "trivy image shivakumarchigiri/realtimeproject:${BUILD_NUMBER}"
+            sh "trivy image shivakumarchigiri/rtproject:${BUILD_NUMBER}"
         }
     }		
  
@@ -52,14 +52,14 @@
                    sh 'docker login -u shivakumarchigiri -p ${dockerhub}'
 
               }
-                   sh 'docker push shivakumarchigiri/realtimeproject:${BUILD_NUMBER}'
+                   sh 'docker push shivakumarchigiri/rtproject:${BUILD_NUMBER}'
                 }
             }
         }
 		
       stage('Update kubernetes Deployment manifest File') {
         environment {
-            GIT_REPO_NAME = "MyProject"
+            GIT_REPO_NAME = "Realtime-Project"
             GIT_USER_NAME = "shivakumarchigiri"
         }
         steps {
@@ -69,7 +69,7 @@
                     git config user.name "shivakumarchigiri"
                     BUILD_NUMBER=${BUILD_NUMBER}
                   
-                    sed -i "s/realtimeproject:.*/realtimeproject:${BUILD_NUMBER}/g" Ansible/k8s_deployment.yaml
+                    sed -i "s/rtproject:.*/rtproject:${BUILD_NUMBER}/g" Ansible/k8s_deployment.yaml
                     git add .
                     git commit -m "Update deployment image tag to version ${BUILD_NUMBER}"
                     git push https://${GITHUB_TOKEN}@github.com/${GIT_USER_NAME}/${GIT_REPO_NAME} HEAD:main
