@@ -16,7 +16,7 @@ spec:
     spec:
       containers:
       - name: mc-app
-        image: shivakumarchigiri/rtproject:2
+        image: shivakumarchigiri/rtproject:3
         ports:
         - containerPort: 8080
 ---
