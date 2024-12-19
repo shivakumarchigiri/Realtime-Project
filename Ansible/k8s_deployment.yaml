@@ -16,7 +16,7 @@ spec:
     spec:
       containers:
       - name: mc-app
-        image: shivakumarchigiri/realtimeproject:3
+        image: shivakumarchigiri/rtproject:3
         ports:
         - containerPort: 8080
 ---
